@@ -9,7 +9,7 @@
 **/.DS_Store
 **/.git/
 **/.gitattributes
-**/.gitignore
+migrations/.gitignore
 **/.gitmodules
 **/compose.*.yaml
 **/compose.*.yml
