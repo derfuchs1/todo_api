@@ -88,7 +88,7 @@ RUN set -eux; \
 	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
 # copy sources
-COPY --link api ./
+COPY --link ./ ./
 RUN rm -Rf frankenphp/
 
 RUN set -eux; \
