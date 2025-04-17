@@ -10,7 +10,6 @@ docker compose build --no-cache --pull
 docker compose run php /bin/sh -c 'composer update; composer outdated'
 
 # Update Symfony recipes
-cd api
 composer recipes:update
 
 echo 'Run `git diff` and carefully inspect the changes made by the recipes.'
