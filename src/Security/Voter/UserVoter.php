@@ -23,26 +23,28 @@ final class UserVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::VIEW, self::LIST, self::CREATE, self::EDIT, self::DELETE]) && $subject instanceof User;
+        if (self::LIST === $attribute) {
+            return true;
+        }
+
+        return in_array($attribute, [self::VIEW, self::CREATE, self::EDIT, self::DELETE]) && $subject instanceof User;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
-
         if (self::CREATE === $attribute && !$user) {
             return true;
-        }
-
-        if (!$user instanceof UserInterface) {
-            return false;
         }
 
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return true;
         }
 
+        if (!$user instanceof UserInterface) {
+            return false;
+        }
 
         return $user === $subject;
     }
