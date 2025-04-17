@@ -6,6 +6,11 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		composer install --prefer-dist --no-progress --no-interaction
 	fi
 
+	if [ "$APP_ENV" != 'prod' ]; then
+		echo "Making sure public / private keys for JWT exist..."
+		php bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
+	fi
+
 	if grep -q ^DATABASE_URL= .env; then
 		echo "Waiting for database to be ready..."
 		ATTEMPTS_LEFT_TO_REACH_DATABASE=60
