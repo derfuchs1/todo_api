@@ -3,12 +3,18 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\UserRepository;
 use App\State\UserPasswordHasher;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -19,7 +25,20 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             validationContext: ['groups' => ['Default', 'user:create']],
             processor: UserPasswordHasher::class,
         ),
-    ]
+        new Get(security: 'is_granted("USER_VIEW", object)'),
+        new GetCollection(security: 'is_granted("USER_LIST", object)'),
+        new Delete(security: 'is_granted("USER_DELETE", object)'),
+        new Put(
+            security: 'is_granted("USER_EDIT", object)',
+            processor: UserPasswordHasher::class
+        ),
+        new Patch(
+            security: 'is_granted("USER_EDIT", object)',
+            processor: UserPasswordHasher::class
+        ),
+    ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:write', 'user:update']],
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -29,11 +48,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[Assert\NotBlank]
     #[Assert\Email]
-    #[Groups(['user:create'])]
+    #[Groups(['user:read', 'user:create', 'user:update'])]
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
@@ -49,8 +69,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    #[Groups(['user:create', 'user:update'])]
     #[Assert\NotBlank(groups: ['user:create'])]
-    #[Groups(['user:create'])]
+    #[SerializedName('password')]
     private ?string $plainPassword = null;
 
     public function getId(): ?int
