@@ -12,10 +12,10 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[AsController]
-class SecurityController extends AbstractController
+class Logout extends AbstractController
 {
     #[Route('/logout', name: 'app_logout', methods: ['POST'])]
-    public function logout(Request $request, EventDispatcherInterface $eventDispatcher, TokenStorageInterface $tokenStorage): JsonResponse
+    public function __invoke(Request $request, EventDispatcherInterface $eventDispatcher, TokenStorageInterface $tokenStorage): JsonResponse
     {
         $eventDispatcher->dispatch(new LogoutEvent($request, $tokenStorage->getToken()));
 
