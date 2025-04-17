@@ -5,7 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use App\Repository\UserRepository;
-use App\State\UserHashPasswordProcessor;
+use App\State\UserPasswordHasher;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -17,7 +17,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     operations: [
         new Post(
             validationContext: ['groups' => ['Default', 'user:create']],
-            processor: UserHashPasswordProcessor::class,
+            processor: UserPasswordHasher::class,
         ),
     ]
 )]
