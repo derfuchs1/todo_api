@@ -2,7 +2,6 @@
 
 namespace App\Story;
 
-use App\Entity\User;
 use App\Factory\UserFactory;
 use Zenstruck\Foundry\Story;
 
