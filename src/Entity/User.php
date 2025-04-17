@@ -23,18 +23,15 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     operations: [
         new Post(
             validationContext: ['groups' => ['Default', 'user:create']],
-            processor: UserPasswordHasher::class,
         ),
         new Get(security: 'is_granted("USER_VIEW", object)'),
         new GetCollection(security: 'is_granted("USER_LIST", object)'),
         new Delete(security: 'is_granted("USER_DELETE", object)'),
         new Put(
             security: 'is_granted("USER_EDIT", object)',
-            processor: UserPasswordHasher::class
         ),
         new Patch(
             security: 'is_granted("USER_EDIT", object)',
-            processor: UserPasswordHasher::class
         ),
     ],
     normalizationContext: ['groups' => ['user:read']],
