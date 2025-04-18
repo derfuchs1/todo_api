@@ -77,7 +77,7 @@ class UserTest extends AbstractApiTestCase
 
     public function testGetCollection()
     {
-        $token = $this->getUserToken();
+        $token = $this->getUserToken()['token'];
 
         $client = static::createClient();
         $client->request('GET', '/users', [
@@ -90,7 +90,7 @@ class UserTest extends AbstractApiTestCase
     }
 
     public function testGetCollectionAdmin() {
-        $token = $this->getAdminToken();
+        $token = $this->getAdminToken()['token'];
 
         $client = static::createClient();
         $response = $client->request('GET', '/users', [
@@ -114,7 +114,7 @@ class UserTest extends AbstractApiTestCase
         $user = UserFactory::createOne();
         $userId = $user->getId();
 
-        $token = $this->getToken($user->getEmail(), $user->getPlainPassword());
+        $token = $this->getToken($user->getEmail(), $user->getPlainPassword())['token'];
 
         $iri = $this->findIriBy(User::class, ['id' => $userId]);
 
@@ -136,7 +136,7 @@ class UserTest extends AbstractApiTestCase
 
     public function testDeleteForeignUser()
     {
-        $token = $this->getUserToken();
+        $token = $this->getUserToken()['token'];
         $adminUser = UserStory::get('adminUser');
 
         $iri = $this->findIriBy(User::class, ['id' => $adminUser->getId()]);
@@ -161,7 +161,7 @@ class UserTest extends AbstractApiTestCase
 
     public function testPutUser()
     {
-        $token = $this->getUserToken();
+        $token = $this->getUserToken()['token'];
 
         $standardUser = UserStory::get('standardUser');
         $userId = $standardUser->getId();
@@ -195,7 +195,7 @@ class UserTest extends AbstractApiTestCase
     }
 
     public function testPutForeignUser() {
-        $token = $this->getUserToken();
+        $token = $this->getUserToken()['token'];
 
         $adminUser = UserStory::get('adminUser');
         $iri = $this->findIriBy(User::class, ['id' => $adminUser->getId()]);
@@ -225,7 +225,7 @@ class UserTest extends AbstractApiTestCase
 
     public function testPatch()
     {
-        $token = $this->getUserToken();
+        $token = $this->getUserToken()['token'];
 
         $standardUser = UserStory::get('standardUser');
         $userId = $standardUser->getId();
@@ -260,7 +260,7 @@ class UserTest extends AbstractApiTestCase
 
     public function testPatchForeignUser()
     {
-        $token = $this->getUserToken();
+        $token = $this->getUserToken()['token'];
 
         $adminUser = UserStory::get('adminUser');
         $iri = $this->findIriBy(User::class, ['id' => $adminUser->getId()]);

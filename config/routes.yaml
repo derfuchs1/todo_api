@@ -6,3 +6,8 @@ controllers:
 login:
     path: /login
     methods: ['POST']
+refresh_token:
+    path: /token/refresh
+    methods: [ 'POST' ]
+token_invalidate:
+    path: /token/invalidate

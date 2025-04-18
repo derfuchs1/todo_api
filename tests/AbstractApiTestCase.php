@@ -12,7 +12,7 @@ class AbstractApiTestCase extends ApiTestCase
 {
     use ResetDatabase, Factories;
 
-    protected function getUserToken(): string
+    protected function getUserToken(): array
     {
         /**
          * @var User $standardUser
@@ -22,7 +22,7 @@ class AbstractApiTestCase extends ApiTestCase
         return $this->getToken($standardUser->getEmail(), $standardUser->getPlainPassword());
     }
 
-    protected function getAdminToken(): string {
+    protected function getAdminToken(): array {
         /**
          * @var User $adminUser
          */
@@ -31,7 +31,7 @@ class AbstractApiTestCase extends ApiTestCase
         return $this->getToken($adminUser->getEmail(), $adminUser->getPlainPassword());
     }
 
-    protected function getToken(string $email, $password): string
+    protected function getToken(string $email, $password): array
     {
         $client = static::createClient();
         $response = $client->request('POST', '/login', [
@@ -41,8 +41,9 @@ class AbstractApiTestCase extends ApiTestCase
             ]
         ]);
 
-        $this->assertResponseIsSuccessful();
+        $cookieJar = $client->getCookieJar();
+        $refreshToken = $cookieJar->get('refresh_token')->getValue();
 
-        return $response->toArray()['token'];
+        return array_merge($response->toArray(), ['refresh_token' => $refreshToken]);
     }
 }

@@ -2,9 +2,7 @@
 
 namespace Api;
 
-use App\Entity\User;
 use App\Factory\UserFactory;
-use App\Story\UserStory;
 use App\Tests\AbstractApiTestCase;
 
 class TokenTest extends AbstractApiTestCase
@@ -26,12 +24,12 @@ class TokenTest extends AbstractApiTestCase
                 'email' => $email,
                 'password' => $password
             ]
-        ]);
+        ])->toArray();
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/json');
 
-        $this->assertNotEmpty($response->toArray()['token']);
+        $this->assertNotEmpty($response['token']);
     }
 
     public function testLogout()
@@ -41,26 +39,35 @@ class TokenTest extends AbstractApiTestCase
         $client = static::createClient();
 
         $client->request('POST', '/logout', [
+            'json' => [
+                'refresh_token' => $token['refresh_token']
+            ],
             'headers' => [
-                'Authorization' => 'Bearer ' . $token
+                'Authorization' => 'Bearer ' . $token['token']
             ]
         ]);
 
-        $standardUser = UserStory::get('standardUser');
-
-        $iri = $this->findIriBy(User::class, ['id' => $standardUser->getId()]);
-
-        $client->request('GET', $iri, [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $token
-            ]
-        ]);
-
-        $this->assertResponseStatusCodeSame(401);
-        $this->assertResponseHeaderSame('content-type', 'application/json');
+        $this->assertResponseStatusCodeSame(200);
         $this->assertJsonContains([
-            'code' => 401,
-            'message' => 'Invalid JWT Token'
+            'code' => 200,
+            'message' => 'The supplied refresh_token has been invalidated.'
         ]);
+    }
+
+    public function testRefreshToken()
+    {
+        $token = $this->getUserToken();
+
+        $client = static::createClient();
+        $response = $client->request('POST', '/token/refresh', [
+            'json' => [
+                'refresh_token' => $token['refresh_token']
+            ]
+        ])->toArray();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseHeaderSame('content-type', 'application/json');
+        $this->assertNotEmpty($response['token']);
+        $this->assertNotEquals($response['token'], $token['token']);
     }
 }
