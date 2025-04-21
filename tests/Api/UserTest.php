@@ -7,6 +7,9 @@ use App\Factory\UserFactory;
 use App\Story\UserStory;
 use App\Tests\AbstractApiTestCase;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 
 class UserTest extends AbstractApiTestCase
@@ -73,6 +76,27 @@ class UserTest extends AbstractApiTestCase
             'description' => 'email: This value is already used.',
             'type' => '/validation_errors/' . UniqueEntity::NOT_UNIQUE_ERROR,
         ]);
+    }
+
+    public function testPasswordLengthValidation()
+    {
+        $client = static::createClient();
+        $response = $client->request('POST', '/users', [
+            'json' => [
+                'email' => 'user@example.com',
+                'password' => '123'
+            ],
+            'headers' => [
+                'Content-Type' => 'application/ld+json'
+            ]
+        ])->toArray(false);
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+
+        $violation = $response['violations'][0];
+        $this->assertEquals('password', $violation['propertyPath']);
+        $this->assertEquals(Length::TOO_SHORT_ERROR, $violation['code']);
     }
 
     public function testGetCollection()
