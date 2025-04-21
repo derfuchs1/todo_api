@@ -99,6 +99,42 @@ class UserTest extends AbstractApiTestCase
         $this->assertEquals(Length::TOO_SHORT_ERROR, $violation['code']);
     }
 
+    public function testEmailValidation()
+    {
+        $client = static::createClient();
+        $response = $client->request('POST', '/users', [
+            'json' => [
+                'email' => 'user',
+                'password' => 'test1234'
+            ],
+            'headers' => [
+                'Content-Type' => 'application/ld+json'
+            ]
+        ])->toArray(false);
+
+        $this->assertResponseStatusCodeSame(422);
+        $this->assertResponseHeaderSame('content-type', 'application/problem+json; charset=utf-8');
+
+        $violation = $response['violations'][0];
+        $this->assertEquals('email', $violation['propertyPath']);
+        $this->assertEquals(Email::INVALID_FORMAT_ERROR, $violation['code']);
+
+        $client = static::createClient();
+        $response = $client->request('POST', '/users', [
+            'json' => [
+                'email' => '',
+                'password' => 'test'
+            ],
+            'headers' => [
+                'Content-Type' => 'application/ld+json'
+            ]
+        ])->toArray(false);
+
+        $violation = $response['violations'][0];
+        $this->assertEquals('email', $violation['propertyPath']);
+        $this->assertEquals(NotBlank::IS_BLANK_ERROR, $violation['code']);
+    }
+
     public function testGetCollection()
     {
         $token = $this->getUserToken()['token'];
