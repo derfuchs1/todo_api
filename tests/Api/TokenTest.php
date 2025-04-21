@@ -1,6 +1,6 @@
 <?php
 
-namespace Api;
+namespace App\Tests\Api;
 
 use App\Factory\UserFactory;
 use App\Tests\AbstractApiTestCase;
